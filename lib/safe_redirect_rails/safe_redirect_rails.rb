@@ -7,7 +7,7 @@ module SafeRedirectRails
     return true if valid_uri?(uri)
     return false if uri.host.nil?
 
-    SafeRedirect.configuration.domain_whitelists.any? do |domain|
+    SafeRedirectRails.configuration.domain_whitelists.any? do |domain|
       if domain.include?("*")
         rf = domain.split(/(\*)/).map{ |f| f == "*" ? "[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]?" : Regexp.escape(f) }
         regexp = Regexp.new("\\A#{rf.join}\\z")
@@ -54,9 +54,9 @@ module SafeRedirectRails
 
   def clean_path(path)
     uri = URI.parse(path)
-    valid_path?(path) && safe_domain?(uri) ? path : SafeRedirect.configuration.default_path
+    valid_path?(path) && safe_domain?(uri) ? path : SafeRedirectRails.configuration.default_path
   rescue URI::InvalidURIError
-    SafeRedirect.configuration.default_path
+    SafeRedirectRails.configuration.default_path
   end
 
   def sanitize_hash(hash)
@@ -79,7 +79,7 @@ module SafeRedirectRails
   end
 
   def whitelist_local?
-    SafeRedirect.configuration.whitelist_local
+    SafeRedirectRails.configuration.whitelist_local
   end
 
   # borrowed the regex from https://github.com/rack/rack/blob/ea9e7a570b7ffd8ac6845a9ebecdd7de0af6b0ca/lib/rack/request.rb#L420
@@ -88,9 +88,9 @@ module SafeRedirectRails
   end
 
   def log(msg, level = :warn)
-    return unless (logger = SafeRedirect.configuration.log)
+    return unless (logger = SafeRedirectRails.configuration.log)
 
-    msg = "[#{Time.now}] SafeRedirect: #{msg}"
+    msg = "[#{Time.now}] SafeRedirectRails: #{msg}"
 
     if logger.respond_to?(level)
       logger.send(level, msg)
